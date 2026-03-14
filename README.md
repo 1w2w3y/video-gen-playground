@@ -65,7 +65,7 @@ The backend proxies all API calls so that tokens and keys never reach the browse
 
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS v4, react-router-dom, react-i18next
 - **Backend**: Express, @azure/identity
-- **Testing**: Playwright
+- **Testing**: Vitest (unit), Playwright (E2E)
 
 ## Scripts
 
@@ -76,7 +76,10 @@ The backend proxies all API calls so that tokens and keys never reach the browse
 | `npm run dev:server` | Start Express backend only |
 | `npm run build` | Type-check and build frontend |
 | `npm run lint` | Run ESLint |
-| `npx playwright test` | Run E2E tests |
+| `npm test` | Run unit tests (Vitest) |
+| `npm run test:watch` | Run unit tests in watch mode |
+| `npm run test:coverage` | Run unit tests with coverage report |
+| `npm run test:e2e` | Run E2E tests (Playwright, requires dev server) |
 
 ## Project Structure
 

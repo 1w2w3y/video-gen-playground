@@ -9,11 +9,11 @@ A web-based UI for generating videos using the Sora-2 model via **Azure AI Found
 | Layer | Choice | Rationale |
 |---|---|---|
 | Frontend | React + TypeScript | Component model, ecosystem, type safety |
-| UI library | Shadcn/ui + Tailwind CSS | Clean defaults, easy theming, minimal bundle |
+| UI library | Tailwind CSS v4 + custom components | Clean defaults, easy theming, minimal bundle |
 | Build tool | Vite | Fast dev server, simple config |
 | Backend | Node.js (Express) | Proxies API calls, holds secrets, handles auth token acquisition |
 | i18n | react-i18next | Mature, supports lazy loading, JSON resource bundles |
-| Auth library | `@azure/identity` | Provides `DefaultAzureCredential` (managed identity) and `AzureCliCredential` |
+| Auth library | `@azure/identity` | Provides `ManagedIdentityCredential` and `AzureCliCredential` |
 | State management | React Context + `useState`/`useReducer` | Sufficient for this scope — no global store needed |
 
 ## 3. Architecture
@@ -122,21 +122,20 @@ Both providers offer similar capabilities but differ in parameter naming and end
 | Unified (internal) | Azure AI Foundry | OpenAI |
 |---|---|---|
 | `prompt` | `prompt` | `prompt` |
-| `width` | `width` | derived from `size` string |
-| `height` | `height` | derived from `size` string |
-| `duration` | `n_seconds` | `seconds` |
-| `variants` | `n_variants` | `n` |
-| `model` | deployment name | `sora-2` / `sora-2-pro` |
-| `inputImage` | `inpaint_items` + multipart | `input_reference` multipart |
+| `width` × `height` | `size` (e.g. `"1280x720"`) | `size` (e.g. `"1280x720"`) |
+| `duration` | `seconds` (as string) | `seconds` (as number) |
+| `variants` | `n` | `n` |
+| `model` | deployment name from config | `sora-2` / `sora-2-pro` |
+| `inputImage` | base64 in request body | base64 in request body |
 
 ### 6.3 Status Mapping
 
 | Unified | Azure | OpenAI |
 |---|---|---|
 | `queued` | `queued` | `queued` |
-| `processing` | `preprocessing` / `running` / `processing` | `in_progress` |
+| `processing` | `preprocessing` / `running` / `processing` / `in_progress` | `in_progress` |
 | `completed` | `succeeded` | `completed` |
-| `failed` | `failed` | `failed` |
+| `failed` | `failed` / `cancelled` | `failed` / `expired` |
 
 ## 7. UI Design
 
@@ -159,14 +158,14 @@ Single-page app with a sidebar navigation:
 
 ### 7.2 Panels
 
-#### Panel 1: Create Video (`/new`)
+#### Panel 1: Create Video (`/`)
 
 - **Prompt** — multiline text area
 - **Resolution** — dropdown (filtered by current provider's supported sizes)
-  - Azure: 480×480, 720×720, 1080×1080, 1280×720, 1920×1080
+  - Azure: 1280×720, 720×1280, 1792×1024, 1024×1792
   - OpenAI: 1280×720, 720×1280, 1920×1080, 1080×1920, 1792×1024, 1024×1792
-- **Duration** — slider or dropdown
-  - Azure: 5–20 seconds
+- **Duration** — dropdown
+  - Azure: 4, 8, or 12 seconds
   - OpenAI: 8, 16, or 20 seconds
 - **Variants** — number input (1–4)
 - **Model** — dropdown (OpenAI: `sora-2`, `sora-2-pro`; Azure: deployment name)
@@ -184,7 +183,7 @@ Single-page app with a sidebar navigation:
   - When completed: embedded `<video>` player with download button
   - Action buttons: **Extend** (creates extension job), **Edit/Remix**, **Delete**
 
-#### Panel 3: Extend Video (`/extend`)
+#### Panel 3: Extend Video (`/extend/:id`)
 
 - Opened from a completed job's detail view
 - Shows source video preview
@@ -192,7 +191,7 @@ Single-page app with a sidebar navigation:
 - **Additional duration** — dropdown
 - Submit → creates extension job
 
-#### Panel 4: Edit/Remix Video (`/edit`)
+#### Panel 4: Edit/Remix Video (`/edit/:id`)
 
 - Opened from a completed job's detail view
 - Shows source video preview
@@ -249,65 +248,71 @@ Only the **UI chrome** is translated. User-entered prompts and API-returned data
 
 ## 11. Development Phases
 
-### Phase 1: Foundation (MVP)
-- [ ] Project scaffolding (Vite + React + TypeScript + Tailwind + Shadcn)
-- [ ] Express backend with proxy architecture
-- [ ] Azure AI Foundry adapter (text-to-video only)
-- [ ] Entra ID auth (AzureCliCredential for local dev)
-- [ ] Create Video panel (prompt, resolution, duration, variants)
-- [ ] Jobs list with status polling and video playback
-- [ ] Basic English UI
+### Phase 1: Foundation (MVP) — Complete
+- [x] Project scaffolding (Vite + React + TypeScript + Tailwind)
+- [x] Express backend with proxy architecture
+- [x] Azure AI Foundry adapter (text-to-video only)
+- [x] Entra ID auth (AzureCliCredential for local dev)
+- [x] Create Video panel (prompt, resolution, duration, variants)
+- [x] Jobs list with status polling and video playback
+- [x] Basic English UI
 
-### Phase 2: Full Feature Set
-- [ ] OpenAI adapter
-- [ ] Provider switching in Settings panel
-- [ ] Image-to-video upload
-- [ ] Video extension support
-- [ ] Video edit/remix support
-- [ ] Delete videos
-- [ ] Chinese translation (i18n)
+### Phase 2: Full Feature Set — Complete
+- [x] OpenAI adapter
+- [x] Provider switching in Settings panel
+- [x] Image-to-video upload
+- [x] Video extension support
+- [x] Video edit/remix support
+- [x] Delete videos
+- [x] Chinese translation (i18n)
 
-### Phase 3: Polish
-- [ ] ManagedIdentityCredential for remote deployment
-- [ ] Runtime endpoint configuration
-- [ ] Error handling improvements (rate limits, token refresh)
-- [ ] Responsive layout tuning
-- [ ] Loading states and skeleton screens
+### Phase 3: Polish — Complete
+- [x] ManagedIdentityCredential for remote deployment
+- [x] Runtime endpoint configuration
+- [x] Error handling improvements
+- [x] Loading states and skeleton screens
+- [x] Unit tests (Vitest) and E2E tests (Playwright)
 
-## 12. File Structure (Planned)
+## 12. File Structure
 
 ```
 video-gen-playground/
 ├── src/
 │   ├── client/                  # React frontend
 │   │   ├── components/
-│   │   │   ├── layout/          # Sidebar, MainContent
+│   │   │   ├── layout/          # Layout, Sidebar
 │   │   │   ├── videos/          # CreateVideo, JobList, JobDetail, ExtendVideo, EditVideo
 │   │   │   ├── settings/        # SettingsPanel
-│   │   │   └── ui/              # Shadcn components
-│   │   ├── hooks/               # useVideos, useConfig, usePolling
+│   │   │   └── ui/              # StatusBadge, Toast
 │   │   ├── i18n/
 │   │   │   ├── en.json
-│   │   │   └── zh.json
-│   │   ├── lib/                 # API client, types
+│   │   │   ├── zh.json
+│   │   │   └── index.ts
+│   │   ├── lib/                 # API client, constants, utils (+ unit tests)
+│   │   ├── test-setup.ts        # Vitest setup for jsdom environment
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   └── server/                  # Express backend
 │       ├── adapters/
 │       │   ├── types.ts         # Unified video API types
 │       │   ├── azure.ts         # Azure AI Foundry adapter
-│       │   └── openai.ts        # OpenAI adapter
+│       │   ├── openai.ts        # OpenAI adapter
+│       │   └── index.ts         # Adapter factory
 │       ├── auth/
 │       │   └── azure-credential.ts
 │       ├── routes/
 │       │   ├── videos.ts
 │       │   └── config.ts
+│       ├── config.ts            # Server config singleton
 │       └── index.ts             # Express entry point
+├── e2e/                         # Playwright E2E tests
+│   └── smoke.spec.ts
 ├── .env.example
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
-├── tailwind.config.ts
+├── vitest.config.ts
+├── playwright.config.ts
 ├── CLAUDE.md
 ├── SPEC.md
 └── README.md
@@ -319,15 +324,18 @@ video-gen-playground/
 
 | Endpoint | Method | Purpose |
 |---|---|---|
-| `POST /openai/v1/video/generations/jobs?api-version=preview` | Create job |
-| `GET  /openai/v1/video/generations/jobs/{id}?api-version=preview` | Poll status |
-| `GET  /openai/v1/video/generations/{gen_id}/content/video?api-version=preview` | Download video |
+| `POST /openai/v1/videos` | Create | Submit a video generation job |
+| `GET  /openai/v1/videos` | List | List all video jobs |
+| `GET  /openai/v1/videos/{id}` | Status | Get job status and metadata |
+| `GET  /openai/v1/videos/{id}/content?variant=video` | Download | Stream the generated video |
+| `DELETE /openai/v1/videos/{id}` | Delete | Delete a video |
+| `POST /openai/v1/videos/extensions` | Extend | Extend an existing video |
+| `POST /openai/v1/videos/edits` | Edit | Edit/remix an existing video |
 
 Auth: `Authorization: Bearer <entra_token>` with scope `https://cognitiveservices.azure.com/.default`
 
-Supported resolutions: 480×480, 720×720, 1080×1080, 1280×720, 1920×1080
-Duration: 5–20 seconds
-Concurrent jobs: max 2 per resource
+Supported resolutions: 1280×720, 720×1280, 1792×1024, 1024×1792
+Duration: 4, 8, or 12 seconds
 
 ### OpenAI Sora-2
 
@@ -345,6 +353,4 @@ Auth: `Authorization: Bearer <api_key>`
 
 Supported resolutions: 1280×720, 720×1280, 1920×1080, 1080×1920, 1792×1024, 1024×1792
 Duration: 8, 16, or 20 seconds
-Models: `sora-2`, `sora-2-pro` (1080p+ requires pro)
-
-> **Note:** Your existing Azure curl example uses `/openai/v1/videos` with `"size": "720x1280"` and `"seconds": "4"`. This follows the OpenAI-style parameter schema (Azure proxying to the v1 schema). The documented Azure-native schema uses separate `width`/`height` and `n_seconds` at a different endpoint path. Both may work — we will test against your actual deployment and adapt accordingly.
+Models: `sora-2`, `sora-2-pro`
