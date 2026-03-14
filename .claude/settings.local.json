@@ -4,7 +4,20 @@
       "Bash(shopt:*)",
       "Bash(git config:*)",
       "Bash(git ls-tree:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(az login:*)",
+      "Bash(az:*)",
+      "Bash(sc query:*)",
+      "WebSearch",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:developers.openai.com)",
+      "WebFetch(domain:qodex.ai)",
+      "WebFetch(domain:techcommunity.microsoft.com)",
+      "WebFetch(domain:www.datacamp.com)",
+      "WebFetch(domain:wilsonwu.me)",
+      "WebFetch(domain:www.eesel.ai)",
+      "WebFetch(domain:docs.litellm.ai)",
+      "WebFetch(domain:help.apiyi.com)"
     ]
   }
 }
