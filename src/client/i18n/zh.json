@@ -5,6 +5,7 @@
   "nav": {
     "create": "创建视频",
     "jobs": "视频任务",
+    "admin": "管理任务",
     "settings": "设置"
   },
   "create": {
@@ -36,26 +37,17 @@
     "actions": "操作",
     "delete": "删除",
     "deleteConfirm": "确定要删除这个视频吗？",
-    "extend": "延伸",
-    "edit": "编辑 / 混剪",
+    "edit": "编辑",
     "download": "下载",
     "viewDetail": "查看详情",
     "back": "返回列表"
   },
-  "extend": {
-    "title": "延伸视频",
-    "sourceVideo": "源视频",
-    "prompt": "续写提示词",
-    "promptPlaceholder": "描述视频应该如何继续...",
-    "duration": "额外时长",
-    "submit": "延伸视频"
-  },
   "edit": {
-    "title": "编辑 / 混剪视频",
+    "title": "编辑视频",
     "sourceVideo": "源视频",
     "prompt": "编辑提示词",
     "promptPlaceholder": "描述您想要做的更改...",
-    "submit": "应用编辑"
+    "submit": "提交编辑"
   },
   "settings": {
     "title": "设置",
@@ -64,6 +56,8 @@
     "providerOpenai": "OpenAI",
     "azureEndpoint": "Azure 终结点",
     "azureEndpointPlaceholder": "https://your-resource.openai.azure.com",
+    "azureEndpointSet": "Azure 终结点已配置",
+    "azureEndpointNotSet": "Azure 终结点未配置",
     "azureDeployment": "部署名称",
     "openaiKey": "OpenAI API 密钥",
     "openaiKeyPlaceholder": "sk-...",
@@ -86,6 +80,11 @@
     "fhdPortrait": "1080×1920（全高清竖屏）",
     "landscape": "1792×1024（横屏）",
     "portrait": "1024×1792（竖屏）"
+  },
+  "admin": {
+    "title": "管理 - 所有视频任务",
+    "description": "来自远程 API 的所有视频任务，包括其他用户的任务。",
+    "empty": "远程 API 上未找到视频任务。"
   },
   "error": {
     "generic": "发生错误",

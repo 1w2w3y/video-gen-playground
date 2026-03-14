@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Scissors } from 'lucide-react';
-import { api, type VideoJob } from '../../lib/api';
+import { api, jobStore, type VideoJob } from '../../lib/api';
 import { useToast } from '../ui/Toast';
 
 export function EditVideo() {
@@ -23,6 +23,7 @@ export function EditVideo() {
     setSubmitting(true);
     try {
       const newJob = await api.editVideo({ videoId: id, prompt: prompt.trim() });
+      jobStore.addId(newJob.id);
       toast(t('edit.title') + ' - OK', 'success');
       navigate(`/jobs/${newJob.id}`);
     } catch (err: any) {

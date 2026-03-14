@@ -51,9 +51,10 @@ test.describe('Video Gen Playground - Smoke Tests', () => {
   test('settings page shows Azure config by default', async ({ page }) => {
     await page.goto(BASE + '/settings');
     // Azure should be the active provider
-    await expect(page.locator('text=Azure Endpoint')).toBeVisible();
+    await expect(page.getByText('Azure Endpoint', { exact: true })).toBeVisible();
     await expect(page.locator('text=Deployment Name')).toBeVisible();
-    // The endpoint input should have our configured value
+    // Should show configured status (not the actual endpoint URL)
+    await expect(page.getByText(/Azure endpoint is (configured|not configured)/)).toBeVisible();
     const endpointInput = page.locator('input[placeholder*="azure"]');
     await expect(endpointInput).toBeVisible();
   });
@@ -106,6 +107,64 @@ test.describe('Video Gen Playground - Smoke Tests', () => {
 
     // Should navigate to jobs page after successful submission
     await expect(page).toHaveURL(/\/jobs/, { timeout: 15000 });
+  });
+
+  test('remix video page loads and submits for a completed job', async ({ page }) => {
+    // Create a video via API and wait for it to complete
+    const createRes = await fetch('http://localhost:3000/api/videos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: 'A red ball bouncing', width: 1280, height: 720, duration: 4, variants: 1 }),
+    });
+    const createdJob = await createRes.json();
+    const jobId = createdJob.id;
+
+    // Poll until job completes (up to 120s)
+    let status = createdJob.status;
+    for (let i = 0; i < 24 && status !== 'completed' && status !== 'failed'; i++) {
+      await new Promise(r => setTimeout(r, 5000));
+      const pollRes = await fetch(`http://localhost:3000/api/videos/${jobId}`);
+      const pollData = await pollRes.json();
+      status = pollData.status;
+    }
+    expect(status).toBe('completed');
+
+    // Seed the job ID into localStorage so the app knows about it
+    await page.goto(BASE);
+    await page.evaluate((id) => {
+      const ids = JSON.parse(localStorage.getItem('video-gen-job-ids') || '[]');
+      if (!ids.includes(id)) ids.unshift(id);
+      localStorage.setItem('video-gen-job-ids', JSON.stringify(ids));
+    }, jobId);
+
+    // Navigate to job detail page
+    await page.goto(BASE + '/jobs/' + jobId);
+    await expect(page.locator('h2:has-text("View Details")')).toBeVisible();
+    await expect(page.getByText('Completed')).toBeVisible();
+
+    // The Remix button should be visible for completed jobs
+    await expect(page.getByText('Remix', { exact: true })).toBeVisible();
+
+    // Click Remix button — should navigate to /edit/:id
+    await page.click('button:has-text("Remix")');
+    await expect(page).toHaveURL(new RegExp(`/edit/${jobId}`));
+    await expect(page.locator('h2:has-text("Remix Video")')).toBeVisible();
+
+    // The source video player should be visible
+    await expect(page.locator('video')).toBeVisible();
+
+    // Fill in the remix prompt
+    await page.fill('textarea', 'Change the ball color to blue');
+
+    // Click Create Remix
+    await page.click('button:has-text("Create Remix")');
+
+    // Should navigate to the new job's detail page
+    await expect(page).toHaveURL(/\/jobs\/video_/, { timeout: 15000 });
+    await expect(page.locator('h2:has-text("View Details")')).toBeVisible();
+
+    // Take screenshot
+    await page.screenshot({ path: 'e2e/screenshots/06-remix-submitted.png', fullPage: true });
   });
 
   test('screenshot the full app flow', async ({ page }) => {

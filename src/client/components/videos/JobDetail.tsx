@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Download, Trash2, Scissors, FastForward } from 'lucide-react';
-import { api, type VideoJob } from '../../lib/api';
+import { ArrowLeft, Download, Trash2, Scissors } from 'lucide-react';
+import { api, jobStore, type VideoJob } from '../../lib/api';
 import { StatusBadge } from '../ui/StatusBadge';
 import { useToast } from '../ui/Toast';
 
@@ -41,6 +41,7 @@ export function JobDetail() {
     if (!id || !confirm(t('jobs.deleteConfirm'))) return;
     try {
       await api.deleteVideo(id);
+      jobStore.removeId(id);
       navigate('/jobs');
     } catch (err: any) {
       toast(err.message, 'error');
@@ -68,22 +69,13 @@ export function JobDetail() {
         </div>
         <div className="flex items-center gap-2">
           {job.status === 'completed' && (
-            <>
-              <button
-                onClick={() => navigate(`/extend/${job.id}`)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
-              >
-                <FastForward size={14} />
-                {t('jobs.extend')}
-              </button>
-              <button
-                onClick={() => navigate(`/edit/${job.id}`)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
-              >
-                <Scissors size={14} />
-                {t('jobs.edit')}
-              </button>
-            </>
+            <button
+              onClick={() => navigate(`/edit/${job.id}`)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+            >
+              <Scissors size={14} />
+              {t('jobs.edit')}
+            </button>
           )}
           <button
             onClick={handleDelete}

@@ -3,6 +3,7 @@ export interface AppConfig {
   azureEndpoint: string;
   azureDeploymentName: string;
   openaiApiKey: string;
+  adminEnabled: boolean;
 }
 
 let config: AppConfig | null = null;
@@ -13,6 +14,7 @@ function initConfig(): AppConfig {
     azureEndpoint: process.env.AZURE_ENDPOINT || '',
     azureDeploymentName: process.env.AZURE_DEPLOYMENT_NAME || 'sora-2',
     openaiApiKey: process.env.OPENAI_API_KEY || '',
+    adminEnabled: process.env.ADMIN_ENABLED === 'true',
   };
 }
 

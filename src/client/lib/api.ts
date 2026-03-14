@@ -32,10 +32,37 @@ export interface VideoJob {
 
 export interface AppConfig {
   provider: 'azure' | 'openai';
-  azureEndpoint: string;
+  hasAzureEndpoint: boolean;
   azureDeploymentName: string;
   hasOpenaiKey: boolean;
+  adminEnabled: boolean;
 }
+
+// localStorage-backed job ID tracker
+const JOB_STORE_KEY = 'video-gen-job-ids';
+
+export const jobStore = {
+  getIds(): string[] {
+    try {
+      return JSON.parse(localStorage.getItem(JOB_STORE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  },
+
+  addId(id: string) {
+    const ids = this.getIds();
+    if (!ids.includes(id)) {
+      ids.unshift(id); // newest first
+      localStorage.setItem(JOB_STORE_KEY, JSON.stringify(ids));
+    }
+  },
+
+  removeId(id: string) {
+    const ids = this.getIds().filter(i => i !== id);
+    localStorage.setItem(JOB_STORE_KEY, JSON.stringify(ids));
+  },
+};
 
 export const api = {
   createVideo(data: {
@@ -54,10 +81,6 @@ export const api = {
     });
   },
 
-  listVideos() {
-    return apiFetch<VideoJob[]>('/videos');
-  },
-
   getVideo(id: string) {
     return apiFetch<VideoJob>(`/videos/${id}`);
   },
@@ -70,18 +93,20 @@ export const api = {
     return `${API_BASE}/videos/${id}/content`;
   },
 
-  extendVideo(data: { videoId: string; prompt: string; duration?: number }) {
-    return apiFetch<VideoJob>('/videos/extensions', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
   editVideo(data: { videoId: string; prompt: string }) {
     return apiFetch<VideoJob>('/videos/edits', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  },
+
+  // Admin endpoints — list all jobs from remote API
+  adminListVideos() {
+    return apiFetch<VideoJob[]>('/admin/videos');
+  },
+
+  adminDeleteVideo(id: string) {
+    return apiFetch<{ success: boolean }>(`/admin/videos/${id}`, { method: 'DELETE' });
   },
 
   getConfig() {

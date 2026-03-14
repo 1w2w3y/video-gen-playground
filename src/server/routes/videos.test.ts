@@ -8,7 +8,6 @@ const mockAdapter = {
   listVideos: vi.fn(),
   deleteVideo: vi.fn(),
   getVideoContent: vi.fn(),
-  extendVideo: vi.fn(),
   editVideo: vi.fn(),
 };
 
@@ -96,16 +95,6 @@ describe('videos routes', () => {
     });
   });
 
-  describe('GET /api/videos', () => {
-    it('lists all video jobs', async () => {
-      mockAdapter.listVideos.mockResolvedValue([sampleJob]);
-
-      const res = await request(app, 'GET', '/api/videos');
-      expect(res.status).toBe(200);
-      expect(res.body).toHaveLength(1);
-    });
-  });
-
   describe('GET /api/videos/:id', () => {
     it('gets a video by id', async () => {
       mockAdapter.getVideo.mockResolvedValue(sampleJob);
@@ -123,21 +112,6 @@ describe('videos routes', () => {
       const res = await request(app, 'DELETE', '/api/videos/v1');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-    });
-  });
-
-  describe('POST /api/videos/extensions', () => {
-    it('extends a video', async () => {
-      mockAdapter.extendVideo.mockResolvedValue({ ...sampleJob, id: 'v-ext' });
-
-      const res = await request(app, 'POST', '/api/videos/extensions', {
-        videoId: 'v1',
-        prompt: 'continue',
-        duration: 8,
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.body.id).toBe('v-ext');
     });
   });
 

@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, ListVideo, Settings, Languages } from 'lucide-react';
+import { Plus, ListVideo, Settings, Languages, ShieldCheck } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { api } from '../../lib/api';
 
 const navItems = [
   { path: '/', icon: Plus, labelKey: 'nav.create' },
@@ -13,6 +15,11 @@ export function Sidebar() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const [adminEnabled, setAdminEnabled] = useState(false);
+
+  useEffect(() => {
+    api.getConfig().then(cfg => setAdminEnabled(cfg.adminEnabled)).catch(() => {});
+  }, []);
 
   const toggleLang = () => {
     const newLang = i18n.language === 'en' ? 'zh' : 'en';
@@ -20,13 +27,17 @@ export function Sidebar() {
     localStorage.setItem('lang', newLang);
   };
 
+  const allNavItems = adminEnabled
+    ? [...navItems.slice(0, 2), { path: '/admin/jobs', icon: ShieldCheck, labelKey: 'nav.admin' }, ...navItems.slice(2)]
+    : navItems;
+
   return (
     <aside className="w-56 bg-zinc-900 border-r border-zinc-800 flex flex-col h-full">
       <div className="p-4 border-b border-zinc-800">
         <h1 className="text-lg font-bold text-white">{t('app.title')}</h1>
       </div>
       <nav className="flex-1 p-2 space-y-1">
-        {navItems.map(({ path, icon: Icon, labelKey }) => (
+        {allNavItems.map(({ path, icon: Icon, labelKey }) => (
           <button
             key={path}
             onClick={() => navigate(path)}

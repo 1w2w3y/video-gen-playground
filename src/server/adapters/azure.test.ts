@@ -139,26 +139,8 @@ describe('azureAdapter', () => {
     });
   });
 
-  describe('extendVideo', () => {
-    it('sends extension request with duration', async () => {
-      globalThis.fetch = mockFetchResponse({ id: 'v-ext', status: 'queued', created_at: 1700000000 });
-
-      const job = await azureAdapter.extendVideo!({
-        videoId: 'v1',
-        prompt: 'continue the scene',
-        duration: 8,
-      });
-
-      expect(job.id).toBe('v-ext');
-      const call = (globalThis.fetch as any).mock.calls[0];
-      const body = JSON.parse(call[1].body);
-      expect(body.video.id).toBe('v1');
-      expect(body.seconds).toBe('8');
-    });
-  });
-
   describe('editVideo', () => {
-    it('sends edit request', async () => {
+    it('sends remix request to correct endpoint', async () => {
       globalThis.fetch = mockFetchResponse({ id: 'v-edit', status: 'queued', created_at: 1700000000 });
 
       const job = await azureAdapter.editVideo!({
@@ -168,7 +150,9 @@ describe('azureAdapter', () => {
 
       expect(job.id).toBe('v-edit');
       const call = (globalThis.fetch as any).mock.calls[0];
-      expect(call[0]).toBe('https://test.azure.com/openai/v1/videos/edits');
+      expect(call[0]).toBe('https://test.azure.com/openai/v1/videos/v1/remix');
+      const body = JSON.parse(call[1].body);
+      expect(body.prompt).toBe('make it blue');
     });
   });
 

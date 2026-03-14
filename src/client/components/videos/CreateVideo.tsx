@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Send, ImagePlus, X } from 'lucide-react';
-import { api, type AppConfig } from '../../lib/api';
+import { api, jobStore, type AppConfig } from '../../lib/api';
 import { AZURE_RESOLUTIONS, OPENAI_RESOLUTIONS, AZURE_DURATIONS, OPENAI_DURATIONS, OPENAI_MODELS } from '../../lib/constants';
 import { useToast } from '../ui/Toast';
 
@@ -65,7 +65,7 @@ export function CreateVideo() {
     setSubmitting(true);
     try {
       const res = resolutions[resolutionIdx];
-      await api.createVideo({
+      const job = await api.createVideo({
         prompt: prompt.trim(),
         width: res.width,
         height: res.height,
@@ -75,6 +75,7 @@ export function CreateVideo() {
         inputImageBase64: imageBase64 || undefined,
         inputImageMediaType: imageMediaType || undefined,
       });
+      jobStore.addId(job.id);
       toast(t('create.title') + ' - OK', 'success');
       navigate('/jobs');
     } catch (err: any) {

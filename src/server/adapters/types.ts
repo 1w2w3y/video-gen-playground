@@ -24,12 +24,6 @@ export interface VideoJob {
   generations: { id: string }[];
 }
 
-export interface ExtendVideoRequest {
-  videoId: string;
-  prompt: string;
-  duration?: number;
-}
-
 export interface EditVideoRequest {
   videoId: string;
   prompt: string;
@@ -41,6 +35,5 @@ export interface VideoAdapter {
   listVideos(): Promise<VideoJob[]>;
   deleteVideo(id: string): Promise<void>;
   getVideoContent(id: string, generationId?: string): Promise<{ stream: NodeJS.ReadableStream; contentType: string }>;
-  extendVideo?(req: ExtendVideoRequest): Promise<VideoJob>;
   editVideo?(req: EditVideoRequest): Promise<VideoJob>;
 }

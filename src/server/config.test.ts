@@ -8,6 +8,7 @@ beforeEach(() => {
   delete process.env.AZURE_ENDPOINT;
   delete process.env.AZURE_DEPLOYMENT_NAME;
   delete process.env.OPENAI_API_KEY;
+  delete process.env.ADMIN_ENABLED;
 });
 
 async function loadConfig() {
@@ -23,6 +24,7 @@ describe('getConfig', () => {
       azureEndpoint: '',
       azureDeploymentName: 'sora-2',
       openaiApiKey: '',
+      adminEnabled: false,
     });
   });
 
@@ -31,6 +33,7 @@ describe('getConfig', () => {
     process.env.AZURE_ENDPOINT = 'https://my-endpoint.azure.com';
     process.env.AZURE_DEPLOYMENT_NAME = 'my-model';
     process.env.OPENAI_API_KEY = 'sk-test-key';
+    process.env.ADMIN_ENABLED = 'true';
 
     const { getConfig } = await loadConfig();
     const config = getConfig();
@@ -39,6 +42,7 @@ describe('getConfig', () => {
       azureEndpoint: 'https://my-endpoint.azure.com',
       azureDeploymentName: 'my-model',
       openaiApiKey: 'sk-test-key',
+      adminEnabled: true,
     });
   });
 

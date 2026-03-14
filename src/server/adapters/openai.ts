@@ -1,5 +1,5 @@
 import { getConfig } from '../config.js';
-import type { CreateVideoRequest, VideoJob, VideoAdapter, ExtendVideoRequest, EditVideoRequest } from './types.js';
+import type { CreateVideoRequest, VideoJob, VideoAdapter, EditVideoRequest } from './types.js';
 
 const OPENAI_BASE = 'https://api.openai.com/v1';
 
@@ -103,28 +103,9 @@ export const openaiAdapter: VideoAdapter = {
     };
   },
 
-  async extendVideo(req: ExtendVideoRequest): Promise<VideoJob> {
-    const body: any = {
-      video: { id: req.videoId },
-      prompt: req.prompt,
-    };
-    if (req.duration) body.seconds = req.duration;
-
-    const res = await openAiFetch('/videos/extensions', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    return mapJob(data);
-  },
-
   async editVideo(req: EditVideoRequest): Promise<VideoJob> {
-    const body = {
-      video: { id: req.videoId },
-      prompt: req.prompt,
-    };
-
-    const res = await openAiFetch('/videos/edits', {
+    const body: any = { prompt: req.prompt };
+    const res = await openAiFetch(`/videos/${req.videoId}/remix`, {
       method: 'POST',
       body: JSON.stringify(body),
     });

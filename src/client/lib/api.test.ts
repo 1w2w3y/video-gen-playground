@@ -35,13 +35,14 @@ describe('api client', () => {
     });
   });
 
-  describe('listVideos', () => {
-    it('GETs /api/videos', async () => {
+  describe('adminListVideos', () => {
+    it('GETs /api/admin/videos', async () => {
       const jobs = [{ id: 'v1' }, { id: 'v2' }];
       globalThis.fetch = mockFetch(jobs);
 
-      const result = await api.listVideos();
+      const result = await api.adminListVideos();
       expect(result).toEqual(jobs);
+      expect(globalThis.fetch).toHaveBeenCalledWith('/api/admin/videos', expect.anything());
     });
   });
 
@@ -69,17 +70,6 @@ describe('api client', () => {
   describe('getVideoContentUrl', () => {
     it('returns correct URL', () => {
       expect(api.getVideoContentUrl('v1')).toBe('/api/videos/v1/content');
-    });
-  });
-
-  describe('extendVideo', () => {
-    it('POSTs to /api/videos/extensions', async () => {
-      globalThis.fetch = mockFetch({ id: 'v-ext' });
-
-      await api.extendVideo({ videoId: 'v1', prompt: 'continue', duration: 8 });
-      expect(globalThis.fetch).toHaveBeenCalledWith('/api/videos/extensions', expect.objectContaining({
-        method: 'POST',
-      }));
     });
   });
 
@@ -123,7 +113,7 @@ describe('api client', () => {
         json: () => Promise.resolve({ error: 'Something broke' }),
       });
 
-      await expect(api.listVideos()).rejects.toThrow('Something broke');
+      await expect(api.getVideo('v1')).rejects.toThrow('Something broke');
     });
 
     it('falls back to statusText when no error in body', async () => {
@@ -134,7 +124,7 @@ describe('api client', () => {
         json: () => Promise.reject(new Error('not json')),
       });
 
-      await expect(api.listVideos()).rejects.toThrow('Internal Server Error');
+      await expect(api.getVideo('v1')).rejects.toThrow('Internal Server Error');
     });
   });
 });

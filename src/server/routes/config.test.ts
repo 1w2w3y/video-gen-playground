@@ -8,6 +8,7 @@ vi.mock('../config.js', () => {
     azureEndpoint: 'https://test.azure.com',
     azureDeploymentName: 'sora-2',
     openaiApiKey: 'sk-secret',
+    adminEnabled: false,
   };
   return {
     getConfig: vi.fn(() => ({ ...config })),
@@ -57,11 +58,13 @@ describe('config routes', () => {
   });
 
   describe('GET /api/config', () => {
-    it('returns config without exposing API key', async () => {
+    it('returns config without exposing secrets', async () => {
       const res = await request(app, 'GET', '/api/config');
       expect(res.status).toBe(200);
       expect(res.body.provider).toBe('azure');
+      expect(res.body.hasAzureEndpoint).toBe(true);
       expect(res.body.hasOpenaiKey).toBe(true);
+      expect(res.body.azureEndpoint).toBeUndefined();
       expect(res.body.openaiApiKey).toBeUndefined();
     });
   });

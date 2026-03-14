@@ -18,7 +18,6 @@ export function SettingsPanel() {
     api.getConfig().then(c => {
       setConfig(c);
       setProvider(c.provider);
-      setAzureEndpoint(c.azureEndpoint);
       setAzureDeployment(c.azureDeploymentName);
     }).catch(() => {});
   }, []);
@@ -26,10 +25,12 @@ export function SettingsPanel() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updates: any = { provider, azureEndpoint, azureDeploymentName: azureDeployment };
+      const updates: any = { provider, azureDeploymentName: azureDeployment };
+      if (azureEndpoint) updates.azureEndpoint = azureEndpoint;
       if (openaiKey) updates.openaiApiKey = openaiKey;
       const c = await api.updateConfig(updates);
       setConfig(c);
+      setAzureEndpoint('');
       setOpenaiKey('');
       toast(t('settings.saved'), 'success');
     } catch (err: any) {
@@ -68,6 +69,9 @@ export function SettingsPanel() {
         <>
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-300">{t('settings.azureEndpoint')}</label>
+            <p className="text-xs text-zinc-500">
+              {config?.hasAzureEndpoint ? t('settings.azureEndpointSet') : t('settings.azureEndpointNotSet')}
+            </p>
             <input
               type="text"
               value={azureEndpoint}

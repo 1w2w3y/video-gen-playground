@@ -23,16 +23,6 @@ videosRouter.post('/', async (req, res) => {
   }
 });
 
-videosRouter.get('/', async (_req, res) => {
-  try {
-    const jobs = await getAdapter().listVideos();
-    res.json(jobs);
-  } catch (err: any) {
-    console.error('List videos error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 videosRouter.get('/:id', async (req, res) => {
   try {
     const job = await getAdapter().getVideo(req.params.id);
@@ -80,22 +70,6 @@ videosRouter.delete('/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err: any) {
     console.error('Delete video error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-videosRouter.post('/extensions', async (req, res) => {
-  try {
-    const adapter = getAdapter();
-    if (!adapter.extendVideo) {
-      res.status(501).json({ error: 'Video extension not supported by current provider' });
-      return;
-    }
-    const { videoId, prompt, duration } = req.body;
-    const job = await adapter.extendVideo({ videoId, prompt, duration });
-    res.json(job);
-  } catch (err: any) {
-    console.error('Extend video error:', err);
     res.status(500).json({ error: err.message });
   }
 });

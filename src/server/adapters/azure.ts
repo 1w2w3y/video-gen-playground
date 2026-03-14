@@ -1,6 +1,6 @@
 import { getAzureToken } from '../auth/azure-credential.js';
 import { getConfig } from '../config.js';
-import type { CreateVideoRequest, VideoJob, VideoAdapter, ExtendVideoRequest, EditVideoRequest } from './types.js';
+import type { CreateVideoRequest, VideoJob, VideoAdapter, EditVideoRequest } from './types.js';
 
 function mapStatus(azureStatus: string): VideoJob['status'] {
   switch (azureStatus) {
@@ -112,27 +112,9 @@ export const azureAdapter: VideoAdapter = {
     };
   },
 
-  async extendVideo(req: ExtendVideoRequest): Promise<VideoJob> {
-    const body: any = {
-      video: { id: req.videoId },
-      prompt: req.prompt,
-    };
-    if (req.duration) body.seconds = String(req.duration);
-
-    const res = await azureFetch('/openai/v1/videos/extensions', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    return mapJob(data);
-  },
-
   async editVideo(req: EditVideoRequest): Promise<VideoJob> {
-    const body = {
-      video: { id: req.videoId },
-      prompt: req.prompt,
-    };
-    const res = await azureFetch('/openai/v1/videos/edits', {
+    const body: any = { prompt: req.prompt };
+    const res = await azureFetch(`/openai/v1/videos/${req.videoId}/remix`, {
       method: 'POST',
       body: JSON.stringify(body),
     });
