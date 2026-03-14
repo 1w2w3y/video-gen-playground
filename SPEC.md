@@ -34,6 +34,9 @@ A web-based UI for generating videos using the Sora-2 model via **Azure AI Found
 │  │ /api/videos/*   →  ApiAdapter        │    │
 │  │                    ├─ AzureAdapter    │    │
 │  │                    └─ OpenAIAdapter   │    │
+│  ├──────────────────────────────────────┤    │
+│  │ /api/admin/*    →  Admin routes      │    │
+│  │                    (gated by env var) │    │
 │  └──────────────────────────────────────┘    │
 │  ┌──────────────────────────────────────┐    │
 │  │ AuthProvider                         │    │
@@ -96,8 +99,9 @@ All configuration via environment variables (with `.env` file support):
 | `AZURE_DEPLOYMENT_NAME` | No | `sora-2` | Model deployment name in Azure AI Foundry |
 | `OPENAI_API_KEY` | If openai | — | OpenAI API key |
 | `PORT` | No | `3000` | Server port |
+| `ADMIN_ENABLED` | No | `false` | Enable admin panel to list/delete all jobs from all users |
 
-The UI also exposes a **Settings panel** where the user can switch provider and update the Azure endpoint at runtime (stored in server memory, not persisted to disk).
+The UI also exposes a **Settings panel** where the user can switch provider and update the deployment name at runtime (stored in server memory, not persisted to disk). The Azure endpoint is not exposed in the config API response — only a boolean indicating whether it is configured.
 
 ## 6. API Abstraction Layer
 
@@ -108,14 +112,16 @@ Both providers offer similar capabilities but differ in parameter naming and end
 | Route | Method | Description |
 |---|---|---|
 | `POST /api/videos` | Create | Submit a video generation job |
-| `GET  /api/videos` | List | List all video jobs (with pagination) |
 | `GET  /api/videos/:id` | Status | Get job status and metadata |
 | `GET  /api/videos/:id/content` | Download | Stream the generated video binary |
 | `DELETE /api/videos/:id` | Delete | Delete a video |
-| `POST /api/videos/extensions` | Extend | Extend an existing video (OpenAI only initially) |
-| `POST /api/videos/edits` | Edit | Remix/edit an existing video |
-| `GET  /api/config` | Config | Return current provider, endpoint, capabilities |
-| `PUT  /api/config` | Config | Update provider/endpoint at runtime |
+| `POST /api/videos/edits` | Edit/Remix | Remix an existing video |
+| `GET  /api/config` | Config | Return current provider, capabilities, admin status |
+| `PUT  /api/config` | Config | Update provider/deployment at runtime |
+| `GET  /api/admin/videos` | Admin | List all video jobs (gated by `ADMIN_ENABLED`) |
+| `DELETE /api/admin/videos/:id` | Admin | Delete any video job (gated by `ADMIN_ENABLED`) |
+
+**Note:** There is no `GET /api/videos` (list all) endpoint. Each client tracks its own job IDs in browser localStorage and queries individual job status via `GET /api/videos/:id`. This prevents users from seeing other users' jobs.
 
 ### 6.2 Parameter Mapping
 
@@ -149,6 +155,7 @@ Single-page app with a sidebar navigation:
 │         │                                  │
 │ ▸ New   │  (active panel content)          │
 │ ▸ Jobs  │                                  │
+│ ▸ Admin │  (only if ADMIN_ENABLED)         │
 │ ▸ Cfg   │                                  │
 │         │                                  │
 │ [EN|中] │                                  │
@@ -170,39 +177,39 @@ Single-page app with a sidebar navigation:
 - **Variants** — number input (1–4)
 - **Model** — dropdown (OpenAI: `sora-2`, `sora-2-pro`; Azure: deployment name)
 - **Input image** (optional) — file upload for image-to-video, with preview
-- **Submit button** → creates job, navigates to Jobs panel
+- **Submit button** → creates job, saves job ID to localStorage, navigates to Jobs panel
 
 #### Panel 2: Video Jobs (`/jobs`)
 
-- Table/card list of all submitted jobs
-- Columns: ID (short), prompt (truncated), status badge, resolution, duration, created time
+- Card list of jobs tracked in browser localStorage
+- Each card shows: prompt (truncated), status badge, resolution, duration, created time
 - Auto-refresh status every 5 seconds for non-terminal jobs (polling)
 - Click a job → **Job Detail** view:
   - Full prompt text
   - Status with progress indicator
   - When completed: embedded `<video>` player with download button
-  - Action buttons: **Extend** (creates extension job), **Edit/Remix**, **Delete**
+  - Action buttons: **Remix** (creates remix job), **Delete**
 
-#### Panel 3: Extend Video (`/extend/:id`)
-
-- Opened from a completed job's detail view
-- Shows source video preview
-- **Continuation prompt** — text area
-- **Additional duration** — dropdown
-- Submit → creates extension job
-
-#### Panel 4: Edit/Remix Video (`/edit/:id`)
+#### Panel 3: Remix Video (`/edit/:id`)
 
 - Opened from a completed job's detail view
 - Shows source video preview
-- **Edit prompt** — text area describing the change
-- Submit → creates edit job
+- **Remix prompt** — text area describing the change
+- Submit → calls `POST /videos/{id}/remix` on the remote API, creates a new job
+
+#### Panel 4: Admin Jobs (`/admin/jobs`) — gated by `ADMIN_ENABLED`
+
+- Sortable table of **all** jobs from the remote API (including other users' jobs)
+- Columns: checkbox, ID, Prompt, Status, Resolution, Duration, Created, Actions
+- Click column headers to sort ascending/descending
+- Multi-select with select-all checkbox and bulk delete button
+- Prompts are loaded in background (list API doesn't return them)
 
 #### Panel 5: Settings (`/settings`)
 
 - **Provider** toggle: Azure AI Foundry / OpenAI
-- **Azure endpoint** — text input (only shown when provider = azure)
-- **Azure deployment name** — text input
+- **Azure endpoint** — shows configured/not configured status; input to change (value not displayed)
+- **Azure deployment name** — text input (value displayed and editable)
 - **OpenAI API key** — password input (only shown when provider = openai; stored server-side)
 - Save button → `PUT /api/config`
 
@@ -219,7 +226,7 @@ Two display languages: **English** (`en`) and **Chinese** (`zh`).
 
 ### Implementation
 
-- Translation files: `src/i18n/en.json` and `src/i18n/zh.json`
+- Translation files: `src/client/i18n/en.json` and `src/client/i18n/zh.json`
 - Language toggle in sidebar footer (persisted to `localStorage`)
 - All user-visible strings go through `t()` function — no hardcoded text
 - Date/time formatting respects locale
@@ -241,8 +248,11 @@ Only the **UI chrome** is translated. User-entered prompts and API-returned data
 
 ## 10. Security Considerations
 
-- API keys and tokens are **never sent to the browser**. All API calls go through the Express backend.
+- API keys, tokens, and Azure endpoint URLs are **never sent to the browser**. All API calls go through the Express backend.
+- The config API returns `hasAzureEndpoint` (boolean) instead of the actual endpoint URL.
 - The Settings panel API key input is write-only (never sent back to the frontend after being set).
+- The job list endpoint is removed — clients track their own job IDs in localStorage and query individual status, preventing users from seeing other users' jobs.
+- Admin endpoints are gated by `ADMIN_ENABLED` env var (default `false`); returns 403 when disabled.
 - Input validation on the backend for all user-supplied parameters.
 - CORS restricted to same-origin in production.
 
@@ -261,8 +271,7 @@ Only the **UI chrome** is translated. User-entered prompts and API-returned data
 - [x] OpenAI adapter
 - [x] Provider switching in Settings panel
 - [x] Image-to-video upload
-- [x] Video extension support
-- [x] Video edit/remix support
+- [x] Video remix support (via Sora 2 remix API)
 - [x] Delete videos
 - [x] Chinese translation (i18n)
 
@@ -273,6 +282,13 @@ Only the **UI chrome** is translated. User-entered prompts and API-returned data
 - [x] Loading states and skeleton screens
 - [x] Unit tests (Vitest) and E2E tests (Playwright)
 
+### Phase 4: Security & Admin — Complete
+- [x] Job isolation — localStorage-based job tracking instead of listing all jobs
+- [x] Hide Azure endpoint from config API response
+- [x] Admin panel with sortable table, multi-select, and bulk delete (gated by ADMIN_ENABLED)
+- [x] Fix remix API to use correct Sora 2 endpoint (`POST /videos/{id}/remix`)
+- [x] Remove unsupported extend video feature
+
 ## 12. File Structure
 
 ```
@@ -281,7 +297,7 @@ video-gen-playground/
 │   ├── client/                  # React frontend
 │   │   ├── components/
 │   │   │   ├── layout/          # Layout, Sidebar
-│   │   │   ├── videos/          # CreateVideo, JobList, JobDetail, ExtendVideo, EditVideo
+│   │   │   ├── videos/          # CreateVideo, JobList, JobDetail, EditVideo, AdminJobList
 │   │   │   ├── settings/        # SettingsPanel
 │   │   │   └── ui/              # StatusBadge, Toast
 │   │   ├── i18n/
@@ -301,8 +317,9 @@ video-gen-playground/
 │       ├── auth/
 │       │   └── azure-credential.ts
 │       ├── routes/
-│       │   ├── videos.ts
-│       │   └── config.ts
+│       │   ├── videos.ts        # /api/videos (create, get, delete, edit)
+│       │   ├── admin.ts         # /api/admin/videos (list all, delete)
+│       │   └── config.ts        # /api/config
 │       ├── config.ts            # Server config singleton
 │       └── index.ts             # Express entry point
 ├── e2e/                         # Playwright E2E tests
@@ -314,7 +331,7 @@ video-gen-playground/
 ├── vitest.config.ts
 ├── playwright.config.ts
 ├── CLAUDE.md
-├── SPEC.md
+├── spec.md
 └── README.md
 ```
 
@@ -329,8 +346,7 @@ video-gen-playground/
 | `GET  /openai/v1/videos/{id}` | Status | Get job status and metadata |
 | `GET  /openai/v1/videos/{id}/content?variant=video` | Download | Stream the generated video |
 | `DELETE /openai/v1/videos/{id}` | Delete | Delete a video |
-| `POST /openai/v1/videos/extensions` | Extend | Extend an existing video |
-| `POST /openai/v1/videos/edits` | Edit | Edit/remix an existing video |
+| `POST /openai/v1/videos/{id}/remix` | Remix | Remix an existing video with a new prompt |
 
 Auth: `Authorization: Bearer <entra_token>` with scope `https://cognitiveservices.azure.com/.default`
 
@@ -346,8 +362,7 @@ Duration: 4, 8, or 12 seconds
 | `GET  /v1/videos/{id}/content?variant=video` | Download video |
 | `GET  /v1/videos` | List videos |
 | `DELETE /v1/videos/{id}` | Delete video |
-| `POST /v1/videos/extensions` | Extend video |
-| `POST /v1/videos/edits` | Edit/remix video |
+| `POST /v1/videos/{id}/remix` | Remix video |
 
 Auth: `Authorization: Bearer <api_key>`
 
