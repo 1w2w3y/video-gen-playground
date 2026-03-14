@@ -18,6 +18,20 @@ A web UI for generating videos using the **Sora-2** model via Azure AI Foundry o
 
 ## Quick Start
 
+### Option A: Docker (recommended)
+
+```bash
+docker pull ghcr.io/1w2w3y/video-gen-playground:latest
+
+docker run -p 3000:3000 \
+  -e AZURE_ENDPOINT=https://your-resource.openai.azure.com \
+  ghcr.io/1w2w3y/video-gen-playground:latest
+```
+
+Open http://localhost:3000 in your browser.
+
+### Option B: From source
+
 ```bash
 # Install dependencies
 npm install
@@ -88,6 +102,29 @@ The backend proxies all API calls so that tokens and keys never reach the browse
 | `npm run test:watch` | Run unit tests in watch mode |
 | `npm run test:coverage` | Run unit tests with coverage report |
 | `npm run test:e2e` | Run E2E tests (Playwright, requires dev server) |
+
+## Docker Image
+
+The Docker image is published to GitHub Container Registry on every push to `main`.
+
+```
+ghcr.io/1w2w3y/video-gen-playground
+```
+
+**Tags:**
+- `latest` — most recent build from `main`
+- `0.YYMM.<run>` — versioned (e.g. `0.2603.1`)
+- `sha-<commit>` — git commit SHA
+
+**Run with environment variables:**
+
+```bash
+docker run -p 3000:3000 \
+  -e PROVIDER=azure \
+  -e AZURE_ENDPOINT=https://your-resource.openai.azure.com \
+  -e AZURE_DEPLOYMENT_NAME=sora-2 \
+  ghcr.io/1w2w3y/video-gen-playground:latest
+```
 
 ## Project Structure
 

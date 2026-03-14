@@ -324,6 +324,9 @@ video-gen-playground/
 │       └── index.ts             # Express entry point
 ├── e2e/                         # Playwright E2E tests
 │   └── smoke.spec.ts
+├── .github/workflows/
+│   └── docker-publish.yml  # CI: build & push Docker image to GHCR
+├── Dockerfile              # Multi-stage build (build frontend → production image)
 ├── .env.example
 ├── package.json
 ├── tsconfig.json
@@ -335,7 +338,29 @@ video-gen-playground/
 └── README.md
 ```
 
-## 13. API Reference Summary
+## 13. Docker & CI/CD
+
+### Docker Image
+
+The app is packaged as a multi-stage Docker image (`Dockerfile`):
+1. **Build stage** — installs all deps, runs `npm run build` to produce the frontend bundle
+2. **Production stage** — installs production deps only, copies server source and built frontend
+
+Image: `ghcr.io/1w2w3y/video-gen-playground`
+
+### CI Pipeline (GitHub Actions)
+
+`.github/workflows/docker-publish.yml` runs on every push to `main`:
+1. Checks out the repo
+2. Logs in to GitHub Container Registry using the built-in `GITHUB_TOKEN`
+3. Builds and pushes the Docker image with three tags:
+   - `0.YYMM.<run_number>` — versioned (e.g. `0.2603.1`)
+   - `sha-<commit>` — git commit SHA
+   - `latest`
+
+The workflow can also be triggered manually via `workflow_dispatch`.
+
+## 14. API Reference Summary
 
 ### Azure AI Foundry Sora-2
 
