@@ -16,6 +16,8 @@ COPY --from=build /app/dist/client ./dist/client
 
 ENV NODE_ENV=production
 ENV PORT=3000
+# Application Insights (optional — pass at runtime)
+# ENV APPINSIGHTS_CONNECTION_STRING=
 EXPOSE 3000
 
-CMD ["npx", "tsx", "src/server/index.ts"]
+CMD ["npx", "tsx", "src/server/start.ts"]

@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Download, Trash2, Scissors } from 'lucide-react';
 import { api, jobStore, type VideoJob } from '../../lib/api';
 import { StatusBadge } from '../ui/StatusBadge';
 import { useToast } from '../ui/Toast';
+import { trackEvent } from '../../lib/telemetry';
 
 export function JobDetail() {
   const { id } = useParams<{ id: string }>();
@@ -13,11 +14,21 @@ export function JobDetail() {
   const { toast } = useToast();
   const [job, setJob] = useState<VideoJob | null>(null);
   const [loading, setLoading] = useState(true);
+  const trackedTerminal = useRef(false);
 
   const fetchJob = useCallback(async () => {
     if (!id) return;
     try {
       const data = await api.getVideo(id);
+      // Track terminal state transitions once
+      if (!trackedTerminal.current && (data.status === 'completed' || data.status === 'failed')) {
+        trackedTerminal.current = true;
+        if (data.status === 'completed') {
+          trackEvent('VideoCompleted', { jobId: data.id });
+        } else {
+          trackEvent('VideoFailed', { jobId: data.id, error: data.error || 'unknown' });
+        }
+      }
       setJob(data);
     } catch (err: any) {
       toast(err.message, 'error');

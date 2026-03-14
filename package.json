@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:client": "vite --port 5173",
-    "dev:server": "tsx watch src/server/index.ts",
+    "dev:server": "tsx watch src/server/start.ts",
     "build": "tsc -b tsconfig.app.json && vite build",
     "lint": "eslint .",
     "test": "vitest run",
@@ -14,10 +14,13 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "preview": "vite preview",
-    "start": "tsx src/server/index.ts"
+    "start": "tsx src/server/start.ts"
   },
   "dependencies": {
     "@azure/identity": "^4.13.0",
+    "@microsoft/applicationinsights-clickanalytics-js": "^3.3.11",
+    "@microsoft/applicationinsights-web": "^3.3.11",
+    "applicationinsights": "^3.14.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cors": "^2.8.6",

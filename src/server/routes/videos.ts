@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getAdapter } from '../adapters/index.js';
+import { trackVideoEvent } from '../telemetry.js';
 
 export const videosRouter = Router();
 
@@ -14,9 +15,17 @@ videosRouter.post('/', async (req, res) => {
       variants: variants || 1,
       model,
     });
+    trackVideoEvent('VideoCreated', {
+      jobId: job.id,
+      resolution: `${job.width}x${job.height}`,
+      duration: String(job.duration),
+      variants: String(job.variants),
+      model: job.model,
+    });
     res.json(job);
   } catch (err: any) {
     console.error('Create video error:', err);
+    trackVideoEvent('VideoCreateFailed', { error: err.message });
     res.status(500).json({ error: err.message });
   }
 });
@@ -65,6 +74,7 @@ videosRouter.get('/:id/content', async (req, res) => {
 videosRouter.delete('/:id', async (req, res) => {
   try {
     await getAdapter().deleteVideo(req.params.id);
+    trackVideoEvent('VideoDeleted', { jobId: req.params.id });
     res.json({ success: true });
   } catch (err: any) {
     console.error('Delete video error:', err);
@@ -81,6 +91,7 @@ videosRouter.post('/edits', async (req, res) => {
     }
     const { videoId, prompt } = req.body;
     const job = await adapter.editVideo({ videoId, prompt });
+    trackVideoEvent('VideoEditStarted', { sourceJobId: videoId, newJobId: job.id });
     res.json(job);
   } catch (err: any) {
     console.error('Edit video error:', err);

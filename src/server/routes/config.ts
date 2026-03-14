@@ -12,6 +12,7 @@ configRouter.get('/', (_req, res) => {
     azureDeploymentName: config.azureDeploymentName,
     hasOpenaiKey: !!config.openaiApiKey,
     adminEnabled: config.adminEnabled,
+    appInsightsConnectionString: config.appInsightsConnectionString,
   });
 });
 
