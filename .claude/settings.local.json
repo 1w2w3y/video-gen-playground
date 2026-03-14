@@ -27,7 +27,11 @@
       "Bash(netstat -aon)",
       "Bash(while read:*)",
       "Bash(do taskkill:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(npx vitest:*)",
+      "Bash(npm test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
