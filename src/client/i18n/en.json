@@ -1,0 +1,95 @@
+{
+  "app": {
+    "title": "Video Gen Playground"
+  },
+  "nav": {
+    "create": "Create Video",
+    "jobs": "Video Jobs",
+    "settings": "Settings"
+  },
+  "create": {
+    "title": "Create Video",
+    "prompt": "Prompt",
+    "promptPlaceholder": "Describe the video you want to generate...",
+    "resolution": "Resolution",
+    "duration": "Duration",
+    "durationUnit": "seconds",
+    "variants": "Variants",
+    "model": "Model",
+    "inputImage": "Input Image (optional)",
+    "inputImageHint": "Upload an image to use as the first frame",
+    "dropImage": "Drop image here or click to upload",
+    "removeImage": "Remove",
+    "submit": "Generate Video",
+    "submitting": "Submitting..."
+  },
+  "jobs": {
+    "title": "Video Jobs",
+    "empty": "No video jobs yet. Create one to get started!",
+    "refresh": "Refresh",
+    "id": "ID",
+    "prompt": "Prompt",
+    "status": "Status",
+    "resolution": "Resolution",
+    "duration": "Duration",
+    "created": "Created",
+    "actions": "Actions",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this video?",
+    "extend": "Extend",
+    "edit": "Edit / Remix",
+    "download": "Download",
+    "viewDetail": "View Details",
+    "back": "Back to list"
+  },
+  "extend": {
+    "title": "Extend Video",
+    "sourceVideo": "Source Video",
+    "prompt": "Continuation Prompt",
+    "promptPlaceholder": "Describe how the video should continue...",
+    "duration": "Additional Duration",
+    "submit": "Extend Video"
+  },
+  "edit": {
+    "title": "Edit / Remix Video",
+    "sourceVideo": "Source Video",
+    "prompt": "Edit Prompt",
+    "promptPlaceholder": "Describe the change you want to make...",
+    "submit": "Apply Edit"
+  },
+  "settings": {
+    "title": "Settings",
+    "provider": "Provider",
+    "providerAzure": "Azure AI Foundry",
+    "providerOpenai": "OpenAI",
+    "azureEndpoint": "Azure Endpoint",
+    "azureEndpointPlaceholder": "https://your-resource.openai.azure.com",
+    "azureDeployment": "Deployment Name",
+    "openaiKey": "OpenAI API Key",
+    "openaiKeyPlaceholder": "sk-...",
+    "openaiKeySet": "API key is set",
+    "openaiKeyNotSet": "API key is not set",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Settings saved successfully"
+  },
+  "status": {
+    "queued": "Queued",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "resolution": {
+    "hdLandscape": "1280×720 (HD Landscape)",
+    "hdPortrait": "720×1280 (HD Portrait)",
+    "fhdLandscape": "1920×1080 (Full HD Landscape)",
+    "fhdPortrait": "1080×1920 (Full HD Portrait)",
+    "landscape": "1792×1024 (Landscape)",
+    "portrait": "1024×1792 (Portrait)"
+  },
+  "error": {
+    "generic": "An error occurred",
+    "network": "Network error. Please check your connection.",
+    "rateLimit": "Rate limit exceeded. Please try again later."
+  }
+}

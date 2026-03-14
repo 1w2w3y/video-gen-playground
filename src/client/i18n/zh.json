@@ -1,0 +1,95 @@
+{
+  "app": {
+    "title": "视频生成实验室"
+  },
+  "nav": {
+    "create": "创建视频",
+    "jobs": "视频任务",
+    "settings": "设置"
+  },
+  "create": {
+    "title": "创建视频",
+    "prompt": "提示词",
+    "promptPlaceholder": "描述您想要生成的视频...",
+    "resolution": "分辨率",
+    "duration": "时长",
+    "durationUnit": "秒",
+    "variants": "变体数量",
+    "model": "模型",
+    "inputImage": "输入图片（可选）",
+    "inputImageHint": "上传图片作为视频的第一帧",
+    "dropImage": "拖放图片到此处或点击上传",
+    "removeImage": "移除",
+    "submit": "生成视频",
+    "submitting": "提交中..."
+  },
+  "jobs": {
+    "title": "视频任务",
+    "empty": "暂无视频任务，创建一个开始吧！",
+    "refresh": "刷新",
+    "id": "ID",
+    "prompt": "提示词",
+    "status": "状态",
+    "resolution": "分辨率",
+    "duration": "时长",
+    "created": "创建时间",
+    "actions": "操作",
+    "delete": "删除",
+    "deleteConfirm": "确定要删除这个视频吗？",
+    "extend": "延伸",
+    "edit": "编辑 / 混剪",
+    "download": "下载",
+    "viewDetail": "查看详情",
+    "back": "返回列表"
+  },
+  "extend": {
+    "title": "延伸视频",
+    "sourceVideo": "源视频",
+    "prompt": "续写提示词",
+    "promptPlaceholder": "描述视频应该如何继续...",
+    "duration": "额外时长",
+    "submit": "延伸视频"
+  },
+  "edit": {
+    "title": "编辑 / 混剪视频",
+    "sourceVideo": "源视频",
+    "prompt": "编辑提示词",
+    "promptPlaceholder": "描述您想要做的更改...",
+    "submit": "应用编辑"
+  },
+  "settings": {
+    "title": "设置",
+    "provider": "服务提供商",
+    "providerAzure": "Azure AI Foundry",
+    "providerOpenai": "OpenAI",
+    "azureEndpoint": "Azure 终结点",
+    "azureEndpointPlaceholder": "https://your-resource.openai.azure.com",
+    "azureDeployment": "部署名称",
+    "openaiKey": "OpenAI API 密钥",
+    "openaiKeyPlaceholder": "sk-...",
+    "openaiKeySet": "API 密钥已设置",
+    "openaiKeyNotSet": "API 密钥未设置",
+    "save": "保存",
+    "saving": "保存中...",
+    "saved": "设置已成功保存"
+  },
+  "status": {
+    "queued": "排队中",
+    "processing": "处理中",
+    "completed": "已完成",
+    "failed": "失败"
+  },
+  "resolution": {
+    "hdLandscape": "1280×720（高清横屏）",
+    "hdPortrait": "720×1280（高清竖屏）",
+    "fhdLandscape": "1920×1080（全高清横屏）",
+    "fhdPortrait": "1080×1920（全高清竖屏）",
+    "landscape": "1792×1024（横屏）",
+    "portrait": "1024×1792（竖屏）"
+  },
+  "error": {
+    "generic": "发生错误",
+    "network": "网络错误，请检查您的连接。",
+    "rateLimit": "已超出速率限制，请稍后重试。"
+  }
+}
