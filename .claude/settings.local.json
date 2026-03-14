@@ -17,7 +17,17 @@
       "WebFetch(domain:wilsonwu.me)",
       "WebFetch(domain:www.eesel.ai)",
       "WebFetch(domain:docs.litellm.ai)",
-      "WebFetch(domain:help.apiyi.com)"
+      "WebFetch(domain:help.apiyi.com)",
+      "Bash(npm create:*)",
+      "Bash(cp:*)",
+      "Bash(npm install:*)",
+      "Bash(npx vite:*)",
+      "Bash(curl:*)",
+      "Bash(kill:*)",
+      "Bash(netstat -aon)",
+      "Bash(while read:*)",
+      "Bash(do taskkill:*)",
+      "Bash(done)"
     ]
   }
 }
