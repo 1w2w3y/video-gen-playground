@@ -51,7 +51,8 @@
       "Bash(cmd.exe /c \"net localgroup himds\" 2>&1)",
       "Bash(powershell -Command \"Get-LocalGroupMember -Group 'himds'\" 2>&1)",
       "Bash(powershell -Command \"Get-LocalGroup | Select-Object Name\" 2>&1 | grep -i \"arc\\\\|himds\\\\|hybrid\\\\|azure\")",
-      "Bash(powershell -Command \"Get-LocalGroupMember -Group 'Hybrid agent extension applications'\" 2>&1)"
+      "Bash(powershell -Command \"Get-LocalGroupMember -Group 'Hybrid agent extension applications'\" 2>&1)",
+      "Bash(ls:*)"
     ]
   }
 }
