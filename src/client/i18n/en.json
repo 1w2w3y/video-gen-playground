@@ -84,7 +84,10 @@
   "admin": {
     "title": "Admin - All Video Jobs",
     "description": "All video jobs from the remote API, including jobs from other users.",
-    "empty": "No video jobs found on the remote API."
+    "empty": "No video jobs found on the remote API.",
+    "selectAll": "Select all",
+    "deleteSelected": "Delete {{count}} selected",
+    "deleteSelectedConfirm": "Are you sure you want to delete {{count}} video(s)?"
   },
   "error": {
     "generic": "An error occurred",

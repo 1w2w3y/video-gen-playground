@@ -84,7 +84,10 @@
   "admin": {
     "title": "管理 - 所有视频任务",
     "description": "来自远程 API 的所有视频任务，包括其他用户的任务。",
-    "empty": "远程 API 上未找到视频任务。"
+    "empty": "远程 API 上未找到视频任务。",
+    "selectAll": "全选",
+    "deleteSelected": "删除 {{count}} 个已选",
+    "deleteSelectedConfirm": "确定要删除 {{count}} 个视频吗？"
   },
   "error": {
     "generic": "发生错误",
