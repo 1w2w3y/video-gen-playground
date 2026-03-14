@@ -1,4 +1,4 @@
-import { ManagedIdentityCredential, AzureCliCredential } from '@azure/identity';
+import { ManagedIdentityCredential, AzureCliCredential, ChainedTokenCredential } from '@azure/identity';
 import type { TokenCredential, AccessToken } from '@azure/identity';
 
 const COGNITIVE_SERVICES_SCOPE = 'https://cognitiveservices.azure.com/.default';
@@ -9,11 +9,17 @@ let cachedToken: AccessToken | null = null;
 function getCredential(): TokenCredential {
   if (!credential) {
     if (process.env.AZURE_CLIENT_ID) {
+      // Explicit user-assigned managed identity
       console.log('Using ManagedIdentityCredential with client ID:', process.env.AZURE_CLIENT_ID);
       credential = new ManagedIdentityCredential({ clientId: process.env.AZURE_CLIENT_ID });
     } else {
-      console.log('Using AzureCliCredential for local development');
-      credential = new AzureCliCredential();
+      // Try system-assigned managed identity first (works on Azure Arc, VMs),
+      // then fall back to Azure CLI for local development
+      console.log('Using ManagedIdentityCredential (system-assigned) with AzureCliCredential fallback');
+      credential = new ChainedTokenCredential(
+        new ManagedIdentityCredential(),
+        new AzureCliCredential(),
+      );
     }
   }
   return credential;
