@@ -5,8 +5,6 @@ export interface CreateVideoRequest {
   duration: number;
   variants: number;
   model?: string;
-  inputImageBase64?: string;
-  inputImageMediaType?: string;
 }
 
 export interface VideoJob {

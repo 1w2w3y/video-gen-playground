@@ -5,7 +5,7 @@ export const videosRouter = Router();
 
 videosRouter.post('/', async (req, res) => {
   try {
-    const { prompt, width, height, duration, variants, model, inputImageBase64, inputImageMediaType } = req.body;
+    const { prompt, width, height, duration, variants, model } = req.body;
     const job = await getAdapter().createVideo({
       prompt,
       width: width || 1280,
@@ -13,8 +13,6 @@ videosRouter.post('/', async (req, res) => {
       duration: duration || 8,
       variants: variants || 1,
       model,
-      inputImageBase64,
-      inputImageMediaType,
     });
     res.json(job);
   } catch (err: any) {

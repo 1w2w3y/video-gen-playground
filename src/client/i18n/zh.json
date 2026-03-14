@@ -17,10 +17,6 @@
     "durationUnit": "秒",
     "variants": "变体数量",
     "model": "模型",
-    "inputImage": "输入图片（可选）",
-    "inputImageHint": "上传图片作为视频的第一帧",
-    "dropImage": "拖放图片到此处或点击上传",
-    "removeImage": "移除",
     "submit": "生成视频",
     "submitting": "提交中..."
   },

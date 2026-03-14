@@ -17,10 +17,6 @@
     "durationUnit": "seconds",
     "variants": "Variants",
     "model": "Model",
-    "inputImage": "Input Image (optional)",
-    "inputImageHint": "Upload an image to use as the first frame",
-    "dropImage": "Drop image here or click to upload",
-    "removeImage": "Remove",
     "submit": "Generate Video",
     "submitting": "Submitting..."
   },

@@ -72,8 +72,6 @@ export const api = {
     duration: number;
     variants: number;
     model?: string;
-    inputImageBase64?: string;
-    inputImageMediaType?: string;
   }) {
     return apiFetch<VideoJob>('/videos', {
       method: 'POST',

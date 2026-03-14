@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, type ChangeEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Send, ImagePlus, X } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { api, jobStore, type AppConfig } from '../../lib/api';
 import { AZURE_RESOLUTIONS, OPENAI_RESOLUTIONS, AZURE_DURATIONS, OPENAI_DURATIONS, OPENAI_MODELS } from '../../lib/constants';
 import { useToast } from '../ui/Toast';
@@ -10,7 +10,6 @@ export function CreateVideo() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [prompt, setPrompt] = useState('');
@@ -18,9 +17,6 @@ export function CreateVideo() {
   const [duration, setDuration] = useState(8);
   const [variants, setVariants] = useState(1);
   const [model, setModel] = useState('sora-2');
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
-  const [imageMediaType, setImageMediaType] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -37,29 +33,6 @@ export function CreateVideo() {
     setDuration(durations[0]);
   }, [config?.provider, durations]);
 
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      setImagePreview(dataUrl);
-      // Extract base64 and media type
-      const [header, base64] = dataUrl.split(',');
-      const mediaType = header.match(/data:(.*?);/)?.[1] || 'image/png';
-      setImageBase64(base64);
-      setImageMediaType(mediaType);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const removeImage = () => {
-    setImagePreview(null);
-    setImageBase64(null);
-    setImageMediaType(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
   const handleSubmit = async () => {
     if (!prompt.trim()) return;
     setSubmitting(true);
@@ -72,8 +45,6 @@ export function CreateVideo() {
         duration,
         variants,
         model: showModelPicker ? model : undefined,
-        inputImageBase64: imageBase64 || undefined,
-        inputImageMediaType: imageMediaType || undefined,
       });
       jobStore.addId(job.id);
       toast(t('create.title') + ' - OK', 'success');
@@ -159,38 +130,6 @@ export function CreateVideo() {
             </select>
           </div>
         )}
-      </div>
-
-      {/* Image Upload */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-zinc-300">{t('create.inputImage')}</label>
-        <p className="text-xs text-zinc-500">{t('create.inputImageHint')}</p>
-        {imagePreview ? (
-          <div className="relative inline-block">
-            <img src={imagePreview} alt="Input" className="max-h-48 rounded-lg border border-zinc-700" />
-            <button
-              onClick={removeImage}
-              className="absolute top-1 right-1 bg-zinc-900/80 rounded-full p-1 hover:bg-red-900"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full border-2 border-dashed border-zinc-700 rounded-lg p-6 text-zinc-500 hover:text-zinc-400 hover:border-zinc-600 transition-colors flex items-center justify-center gap-2"
-          >
-            <ImagePlus size={20} />
-            {t('create.dropImage')}
-          </button>
-        )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          onChange={handleImageUpload}
-          className="hidden"
-        />
       </div>
 
       {/* Submit */}
