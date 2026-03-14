@@ -8,12 +8,13 @@ A web UI for generating videos using the **Sora-2** model via Azure AI Foundry o
 
 - **Text-to-video** generation with configurable resolution, duration, and variants
 - **Image-to-video** — upload an image as the first frame
-- **Video extension** — continue a completed video with a new prompt
-- **Video editing / remix** — apply targeted edits to existing videos
-- **Job management** — list, poll status, view, download, and delete generated videos
+- **Video remix** — apply targeted edits to existing videos via the Sora 2 remix API
+- **Job management** — poll status, view, download, and delete generated videos
+- **Job isolation** — each user only sees their own jobs (stored in browser localStorage)
+- **Admin panel** — optional admin UI to list and bulk-delete all jobs from the remote API
 - **Dual provider support** — Azure AI Foundry (Entra ID auth) and OpenAI (API key)
 - **Bilingual UI** — English and Chinese, auto-detected from browser language
-- **Runtime configuration** — switch provider and endpoint without restarting
+- **Runtime configuration** — switch provider and deployment without restarting
 
 ## Quick Start
 
@@ -41,6 +42,7 @@ Open http://localhost:5173 in your browser.
 | `AZURE_CLIENT_ID` | No | — | Managed identity client ID (remote deploy) |
 | `OPENAI_API_KEY` | If openai | — | OpenAI API key |
 | `PORT` | No | `3000` | Backend server port |
+| `ADMIN_ENABLED` | No | `false` | Enable admin panel to manage all jobs |
 
 ## Authentication
 
@@ -60,6 +62,12 @@ Browser (React SPA)  →  Express Backend (/api/*)  →  Azure AI Foundry / Open
 ```
 
 The backend proxies all API calls so that tokens and keys never reach the browser.
+
+### Security
+
+- API keys, tokens, and Azure endpoint URLs are **never sent to the browser**
+- The job list endpoint (`GET /api/videos`) is removed — clients track their own job IDs in localStorage and query individual job status
+- Admin endpoints (`/api/admin/*`) are gated by the `ADMIN_ENABLED` env var (default off)
 
 ## Tech Stack
 
@@ -92,7 +100,7 @@ src/
 └── server/                 # Express backend
     ├── adapters/           # Azure + OpenAI adapter implementations
     ├── auth/               # Entra ID credential provider
-    └── routes/             # /api/videos, /api/config
+    └── routes/             # /api/videos, /api/admin, /api/config
 ```
 
 ## License
