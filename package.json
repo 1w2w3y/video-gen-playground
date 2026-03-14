@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "tsx src/server/index.ts"
   },
   "dependencies": {
     "@azure/identity": "^4.13.0",

@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Send } from 'lucide-react';
+import { Send, Clock, Sparkles } from 'lucide-react';
 import { api, jobStore, type AppConfig } from '../../lib/api';
 import { AZURE_RESOLUTIONS, OPENAI_RESOLUTIONS, AZURE_DURATIONS, OPENAI_DURATIONS, OPENAI_MODELS } from '../../lib/constants';
+
+const PROMPT_MAX_LENGTH = 1000;
+
+function estimateMinutes(duration: number, width: number, height: number): number {
+  const pixels = width * height;
+  const base = duration <= 4 ? 1.5 : duration <= 8 ? 2.5 : duration <= 12 ? 4 : 5;
+  const resMultiplier = pixels > 1920 * 1080 ? 1.5 : pixels > 1280 * 720 ? 1.2 : 1;
+  return Math.round(base * resMultiplier);
+}
 import { useToast } from '../ui/Toast';
 
 export function CreateVideo() {
@@ -65,11 +74,37 @@ export function CreateVideo() {
         <label className="text-sm font-medium text-zinc-300">{t('create.prompt')}</label>
         <textarea
           value={prompt}
-          onChange={e => setPrompt(e.target.value)}
+          onChange={e => setPrompt(e.target.value.slice(0, PROMPT_MAX_LENGTH))}
           placeholder={t('create.promptPlaceholder')}
           rows={4}
           className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
         />
+        <div className="flex items-center justify-between">
+          <span className={`text-xs ${prompt.length >= PROMPT_MAX_LENGTH ? 'text-red-400' : 'text-zinc-500'}`}>
+            {t('create.charCount', { count: prompt.length, max: PROMPT_MAX_LENGTH })}
+          </span>
+        </div>
+
+        {/* Example prompts */}
+        {!prompt && (
+          <div className="space-y-2">
+            <span className="text-xs text-zinc-500 flex items-center gap-1">
+              <Sparkles size={12} />
+              {t('create.promptExamplesLabel')}
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {(t('create.promptExamples', { returnObjects: true }) as string[]).map((example, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPrompt(example)}
+                  className="text-xs text-left text-zinc-400 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-zinc-200 border border-zinc-700/50 rounded-lg px-3 py-1.5 transition-colors"
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -130,6 +165,12 @@ export function CreateVideo() {
             </select>
           </div>
         )}
+      </div>
+
+      {/* Estimated time */}
+      <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+        <Clock size={12} />
+        {t('create.estimatedTime', { minutes: estimateMinutes(duration, resolutions[resolutionIdx].width, resolutions[resolutionIdx].height) })}
       </div>
 
       {/* Submit */}

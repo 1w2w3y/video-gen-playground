@@ -18,11 +18,27 @@
     "variants": "Variants",
     "model": "Model",
     "submit": "Generate Video",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "promptExamplesLabel": "Try an example:",
+    "promptExamples": [
+      "A golden retriever running through a field of sunflowers at sunset, cinematic lighting",
+      "Ocean waves crashing on a rocky coastline during a dramatic storm, slow motion",
+      "A futuristic city skyline at night with flying cars and neon lights",
+      "A steaming cup of coffee on a wooden table with rain falling outside the window",
+      "An astronaut floating in space with Earth in the background, 4K realistic"
+    ],
+    "charCount": "{{count}} / {{max}} characters",
+    "estimatedTime": "Est. ~{{minutes}} min"
   },
   "jobs": {
     "title": "Video Jobs",
-    "empty": "No video jobs yet. Create one to get started!",
+    "empty": "No video jobs yet",
+    "emptyDescription": "Generate your first AI video to see it here.",
+    "emptyAction": "Create your first video",
+    "filterAll": "All",
+    "filterInProgress": "In Progress",
+    "filterCompleted": "Completed",
+    "filterFailed": "Failed",
     "refresh": "Refresh",
     "id": "ID",
     "prompt": "Prompt",
@@ -84,6 +100,13 @@
     "selectAll": "Select all",
     "deleteSelected": "Delete {{count}} selected",
     "deleteSelectedConfirm": "Are you sure you want to delete {{count}} video(s)?"
+  },
+  "time": {
+    "justNow": "just now",
+    "secondsAgo": "{{count}}s ago",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago"
   },
   "error": {
     "generic": "An error occurred",

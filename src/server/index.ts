@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
 import { videosRouter } from './routes/videos.js';
@@ -23,6 +25,15 @@ app.use('/api/admin', (_req, res, next) => {
   }
   next();
 }, adminRouter);
+
+// In production, serve the built frontend
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDir = path.resolve(__dirname, '../../dist/client');
+app.use(express.static(clientDir));
+app.get('{*path}', (_req, res, next) => {
+  if (_req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(clientDir, 'index.html'));
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

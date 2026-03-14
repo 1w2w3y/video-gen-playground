@@ -18,11 +18,27 @@
     "variants": "变体数量",
     "model": "模型",
     "submit": "生成视频",
-    "submitting": "提交中..."
+    "submitting": "提交中...",
+    "promptExamplesLabel": "试试示例：",
+    "promptExamples": [
+      "一只金毛犬在日落时分奔跑在向日葵花海中，电影级光影",
+      "暴风雨中海浪拍打岩石海岸，慢动作",
+      "未来城市夜景，飞行汽车与霓虹灯光",
+      "窗外下着雨，木桌上一杯冒着热气的咖啡",
+      "宇航员漂浮在太空中，背景是地球，4K写实风格"
+    ],
+    "charCount": "{{count}} / {{max}} 字符",
+    "estimatedTime": "预计 ~{{minutes}} 分钟"
   },
   "jobs": {
     "title": "视频任务",
-    "empty": "暂无视频任务，创建一个开始吧！",
+    "empty": "暂无视频任务",
+    "emptyDescription": "生成您的第一个 AI 视频，它将显示在这里。",
+    "emptyAction": "创建第一个视频",
+    "filterAll": "全部",
+    "filterInProgress": "进行中",
+    "filterCompleted": "已完成",
+    "filterFailed": "失败",
     "refresh": "刷新",
     "id": "ID",
     "prompt": "提示词",
@@ -84,6 +100,13 @@
     "selectAll": "全选",
     "deleteSelected": "删除 {{count}} 个已选",
     "deleteSelectedConfirm": "确定要删除 {{count}} 个视频吗？"
+  },
+  "time": {
+    "justNow": "刚刚",
+    "secondsAgo": "{{count}}秒前",
+    "minutesAgo": "{{count}}分钟前",
+    "hoursAgo": "{{count}}小时前",
+    "daysAgo": "{{count}}天前"
   },
   "error": {
     "generic": "发生错误",
