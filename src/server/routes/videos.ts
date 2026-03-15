@@ -5,27 +5,35 @@ import { trackVideoEvent } from '../telemetry.js';
 export const videosRouter = Router();
 
 videosRouter.post('/', async (req, res) => {
+  const { prompt, width, height, duration, model } = req.body;
+  const inputSize = `${width || 1280}x${height || 720}`;
+  const inputDuration = String(duration || 8);
   try {
-    const { prompt, width, height, duration, variants, model } = req.body;
     const job = await getAdapter().createVideo({
       prompt,
       width: width || 1280,
       height: height || 720,
       duration: duration || 8,
-      variants: variants || 1,
+      variants: 1,
       model,
     });
     trackVideoEvent('VideoCreated', {
       jobId: job.id,
-      resolution: `${job.width}x${job.height}`,
-      duration: String(job.duration),
-      variants: String(job.variants),
+      prompt,
+      size: inputSize,
+      duration: inputDuration,
       model: job.model,
     });
     res.json(job);
   } catch (err: any) {
     console.error('Create video error:', err);
-    trackVideoEvent('VideoCreateFailed', { error: err.message });
+    trackVideoEvent('VideoCreateFailed', {
+      prompt,
+      size: inputSize,
+      duration: inputDuration,
+      model: model || '',
+      error: err.message,
+    });
     res.status(500).json({ error: err.message });
   }
 });
@@ -83,18 +91,27 @@ videosRouter.delete('/:id', async (req, res) => {
 });
 
 videosRouter.post('/edits', async (req, res) => {
+  const { videoId, prompt } = req.body;
   try {
     const adapter = getAdapter();
     if (!adapter.editVideo) {
       res.status(501).json({ error: 'Video editing not supported by current provider' });
       return;
     }
-    const { videoId, prompt } = req.body;
     const job = await adapter.editVideo({ videoId, prompt });
-    trackVideoEvent('VideoEditStarted', { sourceJobId: videoId, newJobId: job.id });
+    trackVideoEvent('VideoEditStarted', {
+      sourceJobId: videoId,
+      newJobId: job.id,
+      prompt,
+    });
     res.json(job);
   } catch (err: any) {
     console.error('Edit video error:', err);
+    trackVideoEvent('VideoEditFailed', {
+      sourceJobId: videoId,
+      prompt,
+      error: err.message,
+    });
     res.status(500).json({ error: err.message });
   }
 });

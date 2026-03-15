@@ -83,8 +83,10 @@ export const api = {
     });
     trackEvent('VideoCreated', {
       jobId: job.id,
-      resolution: `${data.width}x${data.height}`,
+      prompt: data.prompt,
+      size: `${data.width}x${data.height}`,
       duration: String(data.duration),
+      model: data.model || '',
     });
     return job;
   },
@@ -108,7 +110,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    trackEvent('VideoEditStarted', { sourceJobId: data.videoId, newJobId: job.id });
+    trackEvent('VideoEditStarted', {
+      sourceJobId: data.videoId,
+      newJobId: job.id,
+      prompt: data.prompt,
+    });
     return job;
   },
 
