@@ -26,6 +26,12 @@ function getCredential(): TokenCredential {
 }
 
 export async function getAzureToken(): Promise<string> {
+  // If a static token is provided (e.g. for Docker containers that can't use az CLI or Arc),
+  // use it directly. Caller is responsible for refreshing before expiry.
+  if (process.env.AZURE_ACCESS_TOKEN) {
+    return process.env.AZURE_ACCESS_TOKEN;
+  }
+
   // Return cached token if still valid (with 5 min buffer)
   if (cachedToken && cachedToken.expiresOnTimestamp > Date.now() + 5 * 60 * 1000) {
     return cachedToken.token;
