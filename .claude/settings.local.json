@@ -9,7 +9,12 @@
       "Grep(*)",
       "WebSearch",
       "WebFetch(*)",
-      "NotebookEdit(*)"
+      "NotebookEdit(*)",
+      "mcp__wuyi-sample-amg-2603__*"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "wuyi-sample-amg-2603"
+  ]
 }
