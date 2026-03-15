@@ -77,8 +77,6 @@ export const azureAdapter: VideoAdapter = {
       seconds: String(req.duration),
       model: config.azureDeploymentName,
     };
-    if (req.variants > 1) body.n = req.variants;
-
     const res = await azureFetch('/openai/v1/videos', {
       method: 'POST',
       body: JSON.stringify(body),

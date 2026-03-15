@@ -24,7 +24,6 @@ export function CreateVideo() {
   const [prompt, setPrompt] = useState('');
   const [resolutionIdx, setResolutionIdx] = useState(0);
   const [duration, setDuration] = useState(8);
-  const [variants, setVariants] = useState(1);
   const [model, setModel] = useState('sora-2');
   const [submitting, setSubmitting] = useState(false);
 
@@ -52,7 +51,6 @@ export function CreateVideo() {
         width: res.width,
         height: res.height,
         duration,
-        variants,
         model: showModelPicker ? model : undefined,
       });
       jobStore.addId(job.id);
@@ -132,20 +130,6 @@ export function CreateVideo() {
           >
             {durations.map(d => (
               <option key={d} value={d}>{d} {t('create.durationUnit')}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Variants */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-300">{t('create.variants')}</label>
-          <select
-            value={variants}
-            onChange={e => setVariants(Number(e.target.value))}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-600"
-          >
-            {[1, 2, 3, 4].map(n => (
-              <option key={n} value={n}>{n}</option>
             ))}
           </select>
         </div>

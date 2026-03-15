@@ -25,7 +25,6 @@ describe('api client', () => {
         width: 1280,
         height: 720,
         duration: 8,
-        variants: 1,
       });
 
       expect(result).toEqual(job);

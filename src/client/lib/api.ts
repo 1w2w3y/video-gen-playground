@@ -75,7 +75,6 @@ export const api = {
     width: number;
     height: number;
     duration: number;
-    variants: number;
     model?: string;
   }) {
     const job = await apiFetch<VideoJob>('/videos', {

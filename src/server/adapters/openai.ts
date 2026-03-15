@@ -68,8 +68,6 @@ export const openaiAdapter: VideoAdapter = {
       size: sizeString(req.width, req.height),
       seconds: req.duration,
     };
-    if (req.variants > 1) body.n = req.variants;
-
     const res = await openAiFetch('/videos', {
       method: 'POST',
       body: JSON.stringify(body),

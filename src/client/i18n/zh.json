@@ -15,7 +15,6 @@
     "resolution": "分辨率",
     "duration": "时长",
     "durationUnit": "秒",
-    "variants": "变体数量",
     "model": "模型",
     "submit": "生成视频",
     "submitting": "提交中...",

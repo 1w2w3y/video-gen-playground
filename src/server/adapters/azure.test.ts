@@ -73,7 +73,7 @@ describe('azureAdapter', () => {
       );
     });
 
-    it('includes n when variants > 1', async () => {
+    it('does not include n even when variants > 1', async () => {
       globalThis.fetch = mockFetchResponse({ id: 'v1', status: 'queued', created_at: 1700000000 });
 
       await azureAdapter.createVideo({
@@ -86,7 +86,7 @@ describe('azureAdapter', () => {
 
       const call = (globalThis.fetch as any).mock.calls[0];
       const body = JSON.parse(call[1].body);
-      expect(body.n).toBe(3);
+      expect(body.n).toBeUndefined();
     });
   });
 
