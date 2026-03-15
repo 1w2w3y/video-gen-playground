@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "wuyi-sample-amg-2603": {
+            "type": "http",
+            "url": "https://wuyi-sample-amg-2603-geheffa9auhfabg8.wcus.grafana.azure.com/api/azure-mcp",
+            "headers": {
+                "Authorization": "${GRAFANA_SA_TOKEN_WUYI_SAMPLE_AMG_2603}"
+            }
+        }
+    }
+}
