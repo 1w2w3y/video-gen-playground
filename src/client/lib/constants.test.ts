@@ -9,8 +9,8 @@ import {
 
 describe('constants', () => {
   describe('AZURE_RESOLUTIONS', () => {
-    it('has 4 resolution options', () => {
-      expect(AZURE_RESOLUTIONS).toHaveLength(4);
+    it('has 2 resolution options', () => {
+      expect(AZURE_RESOLUTIONS).toHaveLength(2);
     });
 
     it('includes HD landscape 1280x720', () => {

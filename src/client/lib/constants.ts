@@ -1,8 +1,6 @@
 export const AZURE_RESOLUTIONS = [
   { labelKey: 'resolution.hdLandscape', width: 1280, height: 720 },
   { labelKey: 'resolution.hdPortrait', width: 720, height: 1280 },
-  { labelKey: 'resolution.landscape', width: 1792, height: 1024 },
-  { labelKey: 'resolution.portrait', width: 1024, height: 1792 },
 ];
 
 export const OPENAI_RESOLUTIONS = [
